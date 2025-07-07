@@ -1,7 +1,6 @@
 import Item from '../models/item.model.js';
 import Category from '../models/category.model.js';
 
-// ✅ گرفتن همه آیتم‌ها
 export const getAllItems = async (req, res) => {
     try {
         const items = await Item.findAll({
@@ -13,7 +12,6 @@ export const getAllItems = async (req, res) => {
     }
 };
 
-// ✅ گرفتن آیتم با id
 export const getItemById = async (req, res) => {
     const { id } = req.params;
 
@@ -31,7 +29,6 @@ export const getItemById = async (req, res) => {
     }
 };
 
-// ✅ ساخت آیتم جدید
 export const createItem = async (req, res) => {
     const { name, description, price, image, category_id } = req.body;
 
@@ -53,7 +50,6 @@ export const createItem = async (req, res) => {
     }
 };
 
-// ✅ ویرایش آیتم
 export const updateItem = async (req, res) => {
     const { id } = req.params;
     const { name, description, price, image, category_id } = req.body;
@@ -73,7 +69,6 @@ export const updateItem = async (req, res) => {
     }
 };
 
-// ✅ حذف آیتم
 export const deleteItem = async (req, res) => {
     const { id } = req.params;
 
@@ -89,10 +84,13 @@ export const deleteItem = async (req, res) => {
     }
 };
 
-// ✅ آیتم‌های یک کتگوری خاص
 export const getItemsByCategory = async (req, res) => {
     const { categoryId } = req.params;
     try {
+        const category = await Category.findByPk(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, error: 'Category not found' });
+        }
         const items = await Item.findAll({
             where: { category_id: categoryId },
             include: [{ model: Category, as: 'categorys' }]

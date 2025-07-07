@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-
 const OrderItem = sequelize.define('order_items', {
     id: {
         type: DataTypes.INTEGER,
@@ -15,7 +14,7 @@ const OrderItem = sequelize.define('order_items', {
             model: "orders",
             key: 'id',
         },
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',   // اگر سفارش حذف شد، این آیتم هم حذف شود
         onUpdate: "CASCADE"
     },
     item_id: {
@@ -25,20 +24,20 @@ const OrderItem = sequelize.define('order_items', {
             model: "items",
             key: 'id',
         },
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
         onUpdate: "CASCADE"
     },
     quantity: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        defaultValue: 1
     },
     price_each: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false
     }
 }, {
     tableName: 'order_items',
-    timestamps: true
-})
+    timestamps: false
+});
 
 export default OrderItem;
