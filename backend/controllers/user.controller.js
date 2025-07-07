@@ -1,6 +1,7 @@
 import User from "../models/user.model.js"
 import bcrypt from 'bcrypt'
 
+
 export const getAllUsers = async (req, res) => {
     try {
         const user = await User.findAll({});
@@ -10,7 +11,6 @@ export const getAllUsers = async (req, res) => {
         res.status(500).json({ success: 'false', error: err })
     }
 }
-
 
 export const getUserById = async (req, res) => {
     try {
@@ -81,13 +81,41 @@ export const softDelete = async (req, res) => {
     }
 }
 
-
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.destroy({ where: { id: id } })
         res.status(200).json({ success: true, data: user });
     } catch (err) {
+        console.log("Error: ", err)
+        res.status(500).json({ success: false, error: err })
+    }
+}
+
+export const loginUser = async (req, res) => {
+    try {
+        const { name, password } = req.body;
+
+        if (!name || !password)
+            return res.status(400).json({ success: false, error: 'Compelete Fields' })
+
+        const user = await User.findOne({ where: { name } })
+
+        if (!user)
+            return res.status(401).json({ success: false, error: 'Invalid credentials' })
+
+        const compairPassword = await bcrypt.compare(password, user.password)
+
+        if (!compairPassword)
+            return res.status(401).json({ success: false, error: 'Wrong Password' })
+
+        res.status(200).json({
+            success: true,
+            data: { userName: user.name }
+        });
+
+    } catch (err) {
+
         console.log("Error: ", err)
         res.status(500).json({ success: false, error: err })
     }

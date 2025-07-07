@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import db from '../models/index.js';
 import userRouter from '../routes/user.route.js';
+import categoryRouter from '../routes/category.route.js';
+import itemRouter from '../routes/item.route.js';
 
 dotenv.config();
 const app = express();
@@ -20,6 +22,8 @@ app.use(morgan('dev'))
 
 // Routes
 app.use('/api/users', userRouter)
+app.use('/api/categorys', categoryRouter)
+app.use('/api/items', itemRouter)
 
 // Connect DB
 db.sequelize.authenticate()

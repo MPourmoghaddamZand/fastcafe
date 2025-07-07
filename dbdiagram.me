@@ -1,0 +1,47 @@
+Table users {
+  id int [pk, increment]
+  name varchar
+  password varchar
+  created_at timestamp
+}
+
+Table admins {
+  id int [pk, increment]
+  name varchar
+  password varchar
+  created_at timestamp
+}
+
+Table categories {
+  id int [pk, increment]
+  name varchar
+  description varchar
+  created_at timestamp
+}
+
+Table items {
+  id int [pk, increment]
+  name varchar
+  description text
+  price decimal(10,2)
+  image_url varchar
+  category_id int [ref: > categories.id]
+  created_at timestamp
+}
+
+Table orders {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  status varchar // pending, preparing, done, cancelled
+  total_price decimal(10,2)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_items {
+  id int [pk, increment]
+  order_id int [ref: > orders.id]
+  item_id int [ref: > items.id]
+  quantity int
+  price_each decimal(10,2)
+}

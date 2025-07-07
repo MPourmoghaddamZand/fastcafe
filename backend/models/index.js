@@ -8,12 +8,12 @@ import User from "./user.model.js";
 
 
 Category.hasMany(Item, {
-    foreignKey: 'categoryID',
+    foreignKey: 'category_id',
     as: 'items'
 })
 
 Item.belongsTo(Category, {
-    foreignKey: 'categoryID',
+    foreignKey: 'category_id',
     as: 'categorys'
 })
 

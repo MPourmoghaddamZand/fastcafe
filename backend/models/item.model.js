@@ -14,7 +14,7 @@ const Item = sequelize.define('items', {
     },
     description: {
         type: DataTypes.STRING(255),
-        allowNull: false
+        allowNull: true
     },
     price: {
         type: DataTypes.INTEGER,
@@ -24,12 +24,13 @@ const Item = sequelize.define('items', {
         type: DataTypes.STRING(255),
         allowNull: true
     },
-    categoryID: {
+    category_id: {
         type: DataTypes.INTEGER,
         references: {
             model: 'categorys',
             key: 'id'
         },
+        allowNull: false,
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE'
     },
