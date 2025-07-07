@@ -16,6 +16,10 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING(255),
         allowNull: false
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     tableName: 'users',
     timestamps: true

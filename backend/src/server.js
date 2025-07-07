@@ -3,8 +3,8 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import helmet from 'helmet';
 import morgan from 'morgan';
-import sequelize from '../config/db.js';
 import db from '../models/index.js';
+import userRouter from '../routes/user.route.js';
 
 dotenv.config();
 const app = express();
@@ -19,14 +19,14 @@ app.use(helmet())
 app.use(morgan('dev'))
 
 // Routes
-
+app.use('/api/users', userRouter)
 
 // Connect DB
 db.sequelize.authenticate()
     .then(() => {
         console.log("✅ DB Connected");
 
-        return db.sequelize.sync({ alter: false });
+        return db.sequelize.sync({ alter: true });
     })
     .then(() => {
         console.log("✅ Models Synced");
