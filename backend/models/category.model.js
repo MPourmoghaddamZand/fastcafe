@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
 
-const Category = sequelize.define('categorys', {
+const Category = sequelize.define('categories', {
 
     id: {
         type: DataTypes.INTEGER,
@@ -18,7 +18,7 @@ const Category = sequelize.define('categorys', {
         allowNull: true
     },
 }, {
-    tableName: 'categorys',
+    tableName: 'categories',
     timestamps: true
 })
 export default Category;

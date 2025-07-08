@@ -4,7 +4,7 @@ import Category from '../models/category.model.js';
 export const getAllItems = async (req, res) => {
     try {
         const items = await Item.findAll({
-            include: [{ model: Category, as: 'categorys' }]
+            include: [{ model: Category, as: 'categories' }]
         });
         res.status(200).json({ success: true, data: items });
     } catch (err) {
@@ -17,7 +17,7 @@ export const getItemById = async (req, res) => {
 
     try {
         const item = await Item.findByPk(id, {
-            include: [{ model: Category, as: 'categorys' }]
+            include: [{ model: Category, as: 'categories' }]
         });
 
         if (!item)
@@ -93,7 +93,7 @@ export const getItemsByCategory = async (req, res) => {
         }
         const items = await Item.findAll({
             where: { category_id: categoryId },
-            include: [{ model: Category, as: 'categorys' }]
+            include: [{ model: Category, as: 'categories' }]
         });
 
         res.status(200).json({ success: true, data: items });

@@ -8,14 +8,14 @@ import userRouter from '../routes/user.route.js';
 import categoryRouter from '../routes/category.route.js';
 import itemRouter from '../routes/item.route.js';
 import orderRouter from '../routes/order.route.js';
-
-
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from '../lib/swagger.js';
 
 dotenv.config();
 const app = express();
 
-
-
+// Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 // Variant
@@ -29,7 +29,7 @@ app.use(morgan('dev'))
 
 // Routes
 app.use('/api/users', userRouter)
-app.use('/api/categorys', categoryRouter)
+app.use('/api/categories', categoryRouter)
 app.use('/api/items', itemRouter)
 app.use('/api/orders', orderRouter)
 

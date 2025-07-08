@@ -13,7 +13,7 @@ Category.hasMany(Item, {
 });
 Item.belongsTo(Category, {
     foreignKey: 'category_id',
-    as: 'categorys'
+    as: 'categories'
 });
 
 // User ↔ Order

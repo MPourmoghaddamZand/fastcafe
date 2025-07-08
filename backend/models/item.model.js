@@ -27,7 +27,7 @@ const Item = sequelize.define('items', {
     category_id: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'categorys',
+            model: 'categories',
             key: 'id'
         },
         allowNull: false,
