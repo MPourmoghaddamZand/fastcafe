@@ -19,7 +19,7 @@ const Order = sequelize.define('orders', {
         onUpdate: 'CASCADE'
     },
     status: {
-        type: DataTypes.ENUM('Prepair', "Cooking", "Done", 'Cancelled'),
+        type: DataTypes.ENUM("Waiting", 'Prepair', "Cooking", "Done", 'Cancelled'),
         defaultValue: "Prepair",
         allowNull: false
     },
@@ -27,6 +27,10 @@ const Order = sequelize.define('orders', {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
+    table_number: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
 }, {
     tableName: 'orders',
     timestamps: true

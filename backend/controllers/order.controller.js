@@ -2,6 +2,7 @@ import Order from '../models/orders.model.js';
 import OrderItem from '../models/orderItem.model.js';
 import User from '../models/user.model.js';
 import Item from '../models/item.model.js';
+import sequelize from '../config/db.js';
 
 // گرفتن همه سفارش‌ها با جزئیات کاربر و آیتم‌ها
 export const getAllOrders = async (req, res) => {
@@ -29,7 +30,7 @@ export const getOrderById = async (req, res) => {
         const order = await Order.findByPk(id, {
             include: [
                 { model: User, as: 'user' },
-                { model: OrderItem, as: 'order_items', include: [{ model: Item }] }
+                { model: OrderItem, as: 'order_items', include: [{ model: Item, as: 'item' }] }
             ]
         });
 
@@ -43,37 +44,92 @@ export const getOrderById = async (req, res) => {
 };
 
 export const createOrder = async (req, res) => {
-    const { user_id, status } = req.body;
+    const { user_id, status = 'Waiting', items, table_number } = req.body;
 
-    if (!user_id) {
-        return res.status(400).json({ success: false, error: 'user_id is required' });
+    if (!table_number) {
+        return res.status(400).json({
+            success: false,
+            error: 'Select Table'
+        });
+    }
+
+    // 1. اعتبارسنجی اولیه
+    if (!user_id || !Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({
+            success: false,
+            error: 'user_id and items (non-empty array) are required'
+        });
     }
 
     try {
-        const newOrder = await Order.create({
-            user_id,
-            status: status || 'pending',
-            total_price: 0
+        // 2. اجرای تراکنش حرفه‌ای با callback
+        const newOrder = await sequelize.transaction(async (t) => {
+            // 2.1 بررسی وجود کاربر
+            const user = await User.findByPk(user_id);
+            if (!user) throw new Error('User not found');
+
+            // 2.2 ساخت سفارش
+            const order = await Order.create({
+                user_id,
+                status,
+                table_number,
+                totalPrice: 0 // به‌روز خواهد شد
+            }, { transaction: t });
+
+            let totalPrice = 0;
+
+            // 2.3 پردازش و ذخیره آیتم‌ها
+            for (const item of items) {
+                const dbItem = await Item.findByPk(item.item_id);
+                if (!dbItem) {
+                    throw new Error(`Item with id ${item.item_id} not found`);
+                }
+
+                const quantity = item.quantity || 1;
+                const priceEach = dbItem.price;
+                const subtotal = priceEach * quantity;
+
+                totalPrice += subtotal;
+
+                await OrderItem.create({
+                    order_id: order.id,
+                    item_id: dbItem.id,
+                    quantity,
+                    price_each: priceEach
+                }, { transaction: t });
+            }
+
+            // 2.4 به‌روزرسانی مجموع قیمت
+            await order.update({ totalPrice }, { transaction: t });
+
+            return order;
         });
 
-        // بعد از ایجاد سفارش، مجموع قیمت رو به روز کن
-        await updateOrderTotalPrice(newOrder.id);
-        // دوباره سفارش رو بگیر تا با total_price به روز شده ارسال کنی
-        const updatedOrder = await Order.findByPk(newOrder.id);
+        // 3. گرفتن سفارش کامل بعد از commit
+        const fullOrder = await Order.findByPk(newOrder.id, {
+            include: [
+                {
+                    model: OrderItem,
+                    as: 'order_items',
+                    include: [{ model: Item, as: 'item' }]
+                },
+                {
+                    model: User,
+                    as: 'user',
+                    attributes: ['id', 'name']
+                }
+            ]
+        });
 
-        res.status(201).json({ success: true, data: updatedOrder });
+        return res.status(201).json({ success: true, data: fullOrder });
+
     } catch (err) {
-        res.status(500).json({ success: false, error: 'Server error' });
+        return res.status(500).json({
+            success: false,
+            error: err.message || 'Server error'
+        });
     }
 };
-
-
-// آپدیت وضعیت یا اطلاعات سفارش
-async function updateOrderTotalPrice(order_id) {
-    const items = await OrderItem.findAll({ where: { order_id } });
-    const total = items.reduce((sum, item) => sum + item.quantity * item.price_each, 0);
-    await Order.update({ total_price: total }, { where: { id: order_id } });
-}
 
 // حذف سفارش
 export const deleteOrder = async (req, res) => {

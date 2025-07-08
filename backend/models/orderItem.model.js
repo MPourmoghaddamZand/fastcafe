@@ -32,7 +32,7 @@ const OrderItem = sequelize.define('order_items', {
         defaultValue: 1
     },
     price_each: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.INTEGER,
         allowNull: false
     }
 }, {
