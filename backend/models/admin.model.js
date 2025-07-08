@@ -20,6 +20,10 @@ const Admin = sequelize.define('admins', {
         type: DataTypes.ENUM('superadmin', "admin"),
         defaultValue: "admin"
     },
+    isDeleted: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     tableName: 'admins',
     timestamps: true

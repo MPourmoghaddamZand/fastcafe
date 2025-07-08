@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 
 export const getAllUsers = async (req, res) => {
     try {
-        const user = await User.findAll({});
+        const user = await User.findAll({ attributes: { exclude: ['password'] } });
         res.status(200).json({ success: 'true', data: user })
     } catch (err) {
         console.log("Error: ", err)

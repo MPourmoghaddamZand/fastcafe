@@ -10,6 +10,7 @@ import itemRouter from '../routes/item.route.js';
 import orderRouter from '../routes/order.route.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from '../lib/swagger.js';
+import adminRouter from '../routes/admin.route.js';
 
 dotenv.config();
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/users', userRouter)
 app.use('/api/categories', categoryRouter)
 app.use('/api/items', itemRouter)
 app.use('/api/orders', orderRouter)
+app.use('/api/admins', adminRouter)
 
 // Connect DB
 db.sequelize.authenticate()
