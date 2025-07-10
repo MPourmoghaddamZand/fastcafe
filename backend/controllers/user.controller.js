@@ -26,19 +26,32 @@ export const getUserById = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const { name, password } = req.body;
+        console.log("🔥 Received name:", name);
         if (!name || !password)
-            return res.status(400).json({ success: 'false', error: 'Compelete Fields' })
+            return res.status(400).json({ success: false, error: 'Compelete Fields' })
+
+        const existingUser = await User.findOne({
+            where: {
+                name,
+                isDeleted: false
+            }
+        });
+        if (existingUser) {
+            console.log(existingUser)
+            return res.status(409).json({ success: false, error: 'User already exists' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = await User.create({
             name,
             password: hashedPassword
-        })
-        res.status(201).json({ success: 'true', data: user })
+        }, { attributes: { exclude: ['password'] } })
+        // const { password: _discarded, id: _discardedID, ...userWithoutPassword } = user.toJSON();
+        res.status(201).json({ success: true })
     } catch (err) {
         console.log("Error: ", err)
-        res.status(500).json({ success: 'false', error: err })
+        res.status(500).json({ success: false, error: err })
     }
 }
 
