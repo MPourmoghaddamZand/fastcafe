@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import InputField from '../layout/InputField'
 import useSign from '../store/useSign'
+import axios from 'axios';
 const SignUp = () => {
-    const { loginStatus, changeStatus, signUpUser, loginUser, user, error } = useSign();
+    const { loginStatus, changeStatus, signUpUser, getUserData, loginUser, user, error } = useSign();
     const [inputUserName, setInputUserName] = useState('')
     const [inputPassword, setInputPassword] = useState('')
     const handleChangeStatus = () => {
@@ -10,8 +11,10 @@ const SignUp = () => {
     }
 
     useEffect(() => {
-        console.log(user)
-    }, [user])
+        getUserData();
+    }, [])
+
+
     return (
         <>
             {user ?

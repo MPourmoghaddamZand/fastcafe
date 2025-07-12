@@ -8,7 +8,26 @@ export const useSign = create((set, get) => ({
     changeStatus: () => {
         set({ loginStatus: !get().loginStatus });
     },
+    getUserData: async () => {
+        try {
+            const token = localStorage.getItem('token')
+            if (!token) return
 
+            const response = await axios.get(`${BASE_URL}/api/users/profile`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (response.data.user) {
+                get().setUser(response.data.user)
+            } else {
+                localStorage.removeItem('token')
+            }
+        } catch (err) {
+            console.log("dd")
+        }
+    },
     signUpUser: async (name, password) => {
         try {
             const response = await axios.post(`${BASE_URL}/api/users`,
@@ -37,7 +56,7 @@ export const useSign = create((set, get) => ({
             if (response.data.success) {
                 console.log("res: ", response.data.data)
                 get().setUser(response.data.data)
-                localStorage.setItem('user', response.data.data)
+                localStorage.setItem('token', response.data.token)
             }
         } catch (err) {
             console.log(err)

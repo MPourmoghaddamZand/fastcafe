@@ -1,5 +1,10 @@
 import User from "../models/user.model.js"
 import bcrypt from 'bcrypt'
+import dotenv from 'dotenv'
+import jwt from 'jsonwebtoken'
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 
 export const getAllUsers = async (req, res) => {
@@ -14,7 +19,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.params || req.user.id
         const user = await User.findByPk({ id: id })
         res.status(200).json({ success: 'true', data: user })
     } catch (err) {
@@ -121,10 +126,12 @@ export const loginUser = async (req, res) => {
 
         if (!compairPassword)
             return res.status(401).json({ success: false, error: 'Wrong Password' })
+        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: "1h" });
 
         res.status(200).json({
             success: true,
-            data: { userName: user.name }
+            data: { userName: user.name },
+            token
         });
 
     } catch (err) {
@@ -133,3 +140,15 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ success: false, error: err })
     }
 }
+
+export const getProfile = async (req, res) => {
+    try {
+        console.log('req.user:', req.user);
+        console.log('req.headers.authorization:', req.headers.authorization);
+
+        res.status(200).json({ message: 'Test endpoint works' });
+    } catch (err) {
+        console.log("Error: ", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+};
